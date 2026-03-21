@@ -9,7 +9,7 @@ const chat = createAgentChat({
 })
 
 export default function Page() {
-    const { messages, sendMessage, status, stop, error } =
+    const { messages, input, handleInputChange, handleSubmit, status, stop, error } =
         useChat({ chat })
 
     return (
@@ -18,7 +18,7 @@ export default function Page() {
             <div className="flex-1 overflow-hidden border rounded-lg bg-white shadow-sm">
                 <AgentChat
                     messages={messages}
-                    onSend={(msg) => sendMessage({ parts: [{ type: "text", text: msg.content }] })}
+                    onSend={() => handleSubmit()}
                     status={status}
                     onStop={stop}
                     error={error ?? undefined}

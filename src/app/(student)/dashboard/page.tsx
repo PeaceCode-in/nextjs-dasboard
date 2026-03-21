@@ -6,5 +6,5 @@ import DashboardComponent from '@/app/components/student/Dashboard'
 export default function DashboardPage() {
   const { user } = useAuth()
   const router = useRouter()
-  return <DashboardComponent userName={user?.name || ''} />
+  return <DashboardComponent onNavigate={(id) => router.push('/' + id)} userName={user?.name || ''} />
 }
