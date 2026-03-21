@@ -1690,10 +1690,10 @@ export default function MindGym({ userName }: { userName?: string }) {
     if (game.id === 'g10') GameContent = () => <BreathingVisualizer onComplete={handleFinishGame} />
     if (game.id === 'g11') GameContent = () => <EmotionWheelSorter onComplete={handleFinishGame} />
     if (game.id === 'g12') GameContent = () => <AffirmationMatch onComplete={handleFinishGame} />
-    if (game.id === 'g13') GameContent = () => <TensionReleaseMap onComplete={handleFinishGame} />
-    if (game.id === 'g14') GameContent = () => <RippleEffect onComplete={handleFinishGame} />
-    if (game.id === 'g15') GameContent = () => <FocusWaterfall onComplete={handleFinishGame} />
-    if (game.id === 'g16') GameContent = () => <ColorHarmony onComplete={handleFinishGame} />
+    if (game.id === 'g13') GameContent = () => <GameStub name="Tension Release" onComplete={handleFinishGame} />
+    if (game.id === 'g14') GameContent = () => <GameStub name="Ripple Effect" onComplete={handleFinishGame} />
+    if (game.id === 'g15') GameContent = () => <GameStub name="Focus Waterfall" onComplete={handleFinishGame} />
+    if (game.id === 'g16') GameContent = () => <GameStub name="Color Harmony" onComplete={handleFinishGame} />
 
     return (
         <div className="h-full flex flex-col bg-slate-900 rounded-3xl overflow-hidden relative">
