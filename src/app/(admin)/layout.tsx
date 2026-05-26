@@ -50,7 +50,7 @@ function AdminSidebarContent() {
             <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden px-4">
                 {open ? (
                     <div className="flex items-center gap-2 py-3 px-1 mb-4">
-                        <Image src="/assets/Untitled (22).png" alt="Peace Code" width={120} height={28} className="h-7 w-auto" />
+                        <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={120} height={28} className="h-7 w-auto" />
                         <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Admin</span>
                     </div>
                 ) : (
@@ -128,7 +128,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <button onClick={logout} className="p-2 rounded-xl hover:bg-purple-50 text-gray-400 hover:text-purple-500 transition-all duration-300" title="Back to Home">
                             <Home className="w-[18px] h-[18px]" />
                         </button>
-                        <Image src="/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
+                        <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
                         <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Admin</span>
                     </div>
                 </div>

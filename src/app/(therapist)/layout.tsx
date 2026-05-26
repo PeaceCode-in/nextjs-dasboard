@@ -42,7 +42,7 @@ function TherapistSidebarContent() {
             <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden px-4">
                 {open ? (
                     <div className="flex items-center gap-2 py-3 px-1 mb-4">
-                        <Image src="/assets/Untitled (22).png" alt="Peace Code" width={120} height={28} className="h-7 w-auto" />
+                        <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={120} height={28} className="h-7 w-auto" />
                         <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Therapist</span>
                     </div>
                 ) : (
@@ -110,7 +110,7 @@ export default function TherapistLayout({ children }: { children: React.ReactNod
             <nav className="sticky top-0 z-50 h-16 px-4 lg:px-6 flex items-center justify-between bg-white/70 backdrop-blur-xl border-b border-purple-100/50 shadow-[0_4px_30px_rgba(139,138,255,0.07)]">
                 <div className="hidden md:flex items-center gap-2">
                     <button onClick={logout} className="p-2 rounded-xl hover:bg-purple-50 text-gray-400 hover:text-purple-500 transition-all" title="Sign Out"><Home className="w-[18px] h-[18px]" /></button>
-                    <Image src="/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
+                    <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
                     <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Therapist</span>
                 </div>
                 <div className={`relative transition-all duration-500 ease-out hidden md:block ${searchFocused ? 'w-[500px]' : 'w-[380px]'}`}>

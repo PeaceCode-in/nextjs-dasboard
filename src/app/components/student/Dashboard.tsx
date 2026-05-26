@@ -185,7 +185,7 @@ export default function Dashboard({ onNavigate, userName }: DashboardProps) {
         <motion.div variants={fadeUp} className="md:col-span-2 xl:col-span-6">
           <div className="relative h-64 rounded-[2rem] overflow-hidden cursor-pointer group shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(236,72,153,0.15)] transition-all duration-500">
             <img
-              src="/assets/banner image.png"
+              src="/dashboard/assets/banner image.png"
               alt="Wellness Banner"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
