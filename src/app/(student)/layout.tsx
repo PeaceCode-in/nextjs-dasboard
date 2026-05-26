@@ -8,7 +8,7 @@ import {
     Bot, CalendarCheck, UserCheck, ClipboardCheck,
     Wind, Crosshair, Heart, PenLine, Activity, Brain,
     Users, BookMarked, Sparkles, Phone, LayoutDashboard,
-    Settings, BarChart3, Calendar, FileText, Menu, X
+    Settings, BarChart3, Calendar, FileText, Menu, X, LogOut, Home
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 import Image from 'next/image'
@@ -73,7 +73,7 @@ function SidebarContent({ userName, userCollege }: { userName?: string; userColl
                 <div className="flex items-center justify-between mb-8">
                     {open ? (
                         <div className="flex items-center gap-2 py-3 px-1">
-                            <Image src="/assets/Untitled (22).png" alt="Peace Code" width={120} height={28} className="h-7 w-auto" />
+                            <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={120} height={28} className="h-7 w-auto" />
                         </div>
                     ) : (
                         <div className="flex items-center justify-center py-3">
@@ -164,10 +164,10 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <div className="flex items-center gap-3">
                     <div className="md:hidden flex items-center gap-2">
                         <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-xl hover:bg-purple-50 text-gray-500 transition-colors"><Menu className="w-6 h-6" /></button>
-                        <Image src="/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
+                        <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
                     </div>
                     <div className="hidden md:flex items-center gap-2">
-                        <Image src="/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
+                        <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
                         <button onClick={() => router.push('/dashboard')} className={cn('p-2 rounded-xl transition-all duration-300', pathname === '/dashboard' ? 'bg-purple-100 text-purple-600' : 'hover:bg-purple-50 text-gray-400 hover:text-purple-500')} title="Dashboard">
                             <LayoutDashboard className="w-[18px] h-[18px]" />
                         </button>
@@ -181,7 +181,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 <div className="flex items-center gap-2">
                     <div className="relative">
                         <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-gray-600 hover:bg-purple-50 transition-all duration-300 font-medium" onClick={() => setShowServices(!showServices)}>
-                            <span className="hidden sm:inline">My Services</span>
+                        <span className="hidden sm:inline">My Services</span>
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${showServices ? 'rotate-180' : ''}`} />
                         </button>
                         <AnimatePresence>
@@ -199,6 +199,19 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                             )}
                         </AnimatePresence>
                     </div>
+                    <button
+                        onClick={() => { window.location.href = process.env.NODE_ENV === 'production' ? 'https://peacecode.in' : 'http://localhost:3000' }}
+                        className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-purple-600 hover:bg-purple-50 font-medium transition-all"
+                    >
+                        <Home className="w-4 h-4" /> Landing Page
+                    </button>
+                    <button
+                        onClick={logout}
+                        className="hidden md:flex p-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all"
+                        title="Sign Out"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
                     <button
                         onClick={() => router.push('/notifications')}
                         className="relative p-2.5 rounded-xl hover:bg-purple-50 transition-all duration-300"

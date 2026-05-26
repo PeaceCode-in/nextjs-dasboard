@@ -1,6 +1,9 @@
-import { redirect } from 'next/navigation'
+'use client'
 
-// Signup is part of the login page (toggle between login/signup)
+import SignInPage from '@/app/components/SignInPage'
+import { useAuth } from '@/app/lib/AuthContext'
+
 export default function SignupPage() {
-    redirect('/login')
+    const { login } = useAuth()
+    return <SignInPage initialMode="signup" onSignIn={login} />
 }

@@ -6,8 +6,8 @@ import {
     ArrowRight, ArrowLeft, User, GraduationCap, ShieldCheck, Heart,
     Mail, Building, Briefcase, CheckCircle2, Sparkles, Lock, Phone
 } from 'lucide-react'
-const logoImg = '/assets/Untitled (22).png'
-const mascotSvg = '/assets/Untitled design.svg'
+const logoImg = '/dashboard/assets/Untitled (22).png'
+const mascotSvg = '/dashboard/assets/Untitled design.svg'
 
 /* ─── TYPES ─── */
 
@@ -26,6 +26,7 @@ export interface UserInfo {
 
 interface SignInPageProps {
     onSignIn: (user: UserInfo) => void
+    initialMode?: 'login' | 'signup'
 }
 
 /* ─── ANIMATION VARIANTS ─── */
@@ -150,9 +151,10 @@ function BreathingOrb({ active, hasInput, step }: { active: boolean; hasInput: b
 
 /* ─── MAIN COMPONENT ─── */
 
-export default function SignInPage({ onSignIn }: SignInPageProps) {
-    const [isLogin, setIsLogin] = useState(false)
+export default function SignInPage({ onSignIn, initialMode = 'signup' }: SignInPageProps) {
+    const [isLogin, setIsLogin] = useState(initialMode === 'login')
     const [step, setStep] = useState(1)
+    const [isSuccess, setIsSuccess] = useState(false)
 
     // Form fields
     const [name, setName] = useState('')
@@ -180,7 +182,9 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
     const handleMockSubmit = () => {
         setIsSubmitting(true)
         setTimeout(() => {
-            onSignIn({
+            setIsSubmitting(false)
+            setIsSuccess(true)
+            const userInfo: UserInfo = {
                 name: isLogin ? 'Demo User' : name.trim(),
                 role: !isLogin && selectedRole ? selectedRole : 'student',
                 email: email.trim(),
@@ -190,7 +194,10 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
                 branch: branch.trim() || undefined,
                 phoneNumber: phoneNumber.trim() || undefined,
                 speciality: speciality.trim() || undefined
-            })
+            }
+            setTimeout(() => {
+                onSignIn(userInfo)
+            }, 1500)
         }, 1000)
     }
 
@@ -261,7 +268,27 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
 
                     {/* Dynamic Form Content */}
                     <AnimatePresence mode="wait">
-                        {isLogin ? (
+                        {isSuccess ? (
+                            <motion.div key="success" {...fadeSlide} className="w-full flex flex-col items-center justify-center py-12">
+                                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
+                                    <CheckCircle2 className="w-10 h-10 text-green-500" />
+                                </div>
+                                <h2 className="text-2xl font-black text-gray-900 mb-2 text-center">
+                                    {isLogin ? "Welcome Back!" : "Account Created!"}
+                                </h2>
+                                <p className="text-sm text-gray-500 text-center mb-8">
+                                    {isLogin ? "You have successfully logged in." : "Your account has been created successfully."}
+                                </p>
+                                <button
+                                    className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center text-white transition-all duration-300 opacity-80 cursor-not-allowed"
+                                    style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)', boxShadow: '0 12px 30px #c4b5fd60, 0 4px 12px #a78bfa40' }}
+                                    disabled
+                                >
+                                    <Sparkles className="w-5 h-5 animate-spin mr-2" />
+                                    Redirecting...
+                                </button>
+                            </motion.div>
+                        ) : isLogin ? (
                             /* ── LOG IN FLOW ── */
                             <motion.div key="login" {...fadeSlide} className="w-full">
                                 <h1 className="text-[26px] font-black text-gray-900 mb-1 leading-snug text-center">

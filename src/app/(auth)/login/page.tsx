@@ -5,5 +5,5 @@ import { useAuth } from '@/app/lib/AuthContext'
 
 export default function LoginPage() {
     const { login } = useAuth()
-    return <SignInPage onSignIn={login} />
+    return <SignInPage initialMode="login" onSignIn={login} />
 }

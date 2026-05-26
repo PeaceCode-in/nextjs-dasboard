@@ -41,14 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Write a cookie for middleware to read
         document.cookie = `peacecode_role=${userInfo.role}; path=/; max-age=86400; SameSite=Lax`
         document.cookie = `peacecode_auth=1; path=/; max-age=86400; SameSite=Lax`
-        // Redirect based on role
-        if (userInfo.role === 'admin') {
-            router.push('/admin/dashboard')
-        } else if (userInfo.role === 'therapist') {
-            router.push('/therapist/dashboard')
-        } else {
-            router.push('/dashboard')
-        }
+        
+        if (userInfo.role === 'admin') router.push('/admin/dashboard')
+        else if (userInfo.role === 'therapist') router.push('/dashboard') // Therapist might share /dashboard or use their own root
+        else router.push('/dashboard')
     }, [router])
 
     const logout = useCallback(() => {
@@ -56,8 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem(STORAGE_KEY)
         document.cookie = 'peacecode_auth=; path=/; max-age=0'
         document.cookie = 'peacecode_role=; path=/; max-age=0'
-        router.push('/login')
-    }, [router])
+        const landingPageUrl = process.env.NODE_ENV === 'production' ? 'https://peacecode.in' : 'http://localhost:3000'
+        window.location.href = landingPageUrl
+    }, [])
 
     return (
         <AuthContext.Provider value={{ user, isLoading, login, logout }}>
