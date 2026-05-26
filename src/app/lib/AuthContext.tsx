@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         document.cookie = `peacecode_auth=1; path=/; max-age=86400; SameSite=Lax`
         
         if (userInfo.role === 'admin') router.push('/admin/dashboard')
-        else if (userInfo.role === 'therapist') router.push('/dashboard') // Therapist might share /dashboard or use their own root
+        else if (userInfo.role === 'therapist') router.push('/therapist/dashboard')
         else router.push('/dashboard')
     }, [router])
 
