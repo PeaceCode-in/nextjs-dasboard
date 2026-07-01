@@ -1,27 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-    ArrowRight, ArrowLeft, User, GraduationCap, ShieldCheck, Heart,
-    Mail, Building, Briefcase, CheckCircle2, Sparkles, Lock, Phone
-} from 'lucide-react'
-const logoImg = '/dashboard/assets/Untitled (22).png'
-const mascotSvg = '/dashboard/assets/Untitled design.svg'
+import { ArrowRight, Mail, ShieldCheck, User, Sparkles, Building, Hash, GraduationCap } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Playfair_Display } from 'next/font/google'
 
-/* ─── TYPES ─── */
+// Fallback serif font
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '500', '600'] })
 
 export interface UserInfo {
     name: string
     role: 'student' | 'admin' | 'therapist'
-    college?: string
     email?: string
-    speciality?: string
-    // New fields for student
-    university?: string
+    schoolNumber?: string
+    college?: string
     year?: string
-    branch?: string
-    phoneNumber?: string
 }
 
 interface SignInPageProps {
@@ -29,726 +23,368 @@ interface SignInPageProps {
     initialMode?: 'login' | 'signup'
 }
 
-/* ─── ANIMATION VARIANTS ─── */
-
-const fadeSlide = {
-    initial: { opacity: 0, x: 24 },
-    animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
-    exit: { opacity: 0, x: -24, transition: { duration: 0.25 } },
-}
-
-/* ─── ROLES ─── */
-
-const roles = [
-    {
-        id: 'student' as const,
-        label: 'Student',
-        description: 'Wellness & support',
-        icon: GraduationCap,
-        gradient: 'from-purple-400 to-indigo-400',
-    },
-    {
-        id: 'admin' as const,
-        label: 'Admin',
-        description: 'Analytics & reports',
-        icon: ShieldCheck,
-        gradient: 'from-indigo-400 to-blue-400',
-    },
-    {
-        id: 'therapist' as const,
-        label: 'Psychologist',
-        description: 'Sessions & care',
-        icon: Heart,
-        gradient: 'from-violet-400 to-purple-400',
-    },
-]
-
-/* ─── BREATHING ORB (3D depth aura) ─── */
-
-function BreathingOrb({ active, hasInput, step }: { active: boolean; hasInput: boolean; step: number }) {
-    const colors = step === 1 ? ['#a78bfa', '#a5b4fc', '#ddd6fe'] : ['#bfdbfe', '#a5f3fc', '#a78bfa']
-    return (
-        <div className="relative flex items-center justify-center w-full h-full">
-            {/* Outer atmospheric rings */}
-            {[1, 2, 3].map((i) => (
-                <motion.div
-                    key={i}
-                    className="absolute rounded-full border pointer-events-none"
-                    style={{
-                        width: `${160 + i * 60}px`,
-                        height: `${160 + i * 60}px`,
-                        borderColor: `${colors[i - 1]}60`,
-                    }}
-                    animate={{
-                        scale: active ? [1, 1.06, 1] : [1, 1.02, 1],
-                        opacity: active ? [0.5, 0.8, 0.5] : [0.2, 0.35, 0.2],
-                    }}
-                    transition={{ duration: 3 + i * 0.8, repeat: Infinity, ease: 'easeInOut' as const, delay: i * 0.4 }}
-                />
-            ))}
-
-            {/* Main 3D Sphere */}
-            <motion.div
-                animate={{
-                    scale: active ? [1, 1.08, 1] : [1, 1.03, 1],
-                    rotateY: [0, 5, 0, -5, 0],
-                }}
-                transition={{ scale: { duration: 3, repeat: Infinity, ease: 'easeInOut' as const }, rotateY: { duration: 6, repeat: Infinity, ease: 'easeInOut' as const } }}
-                style={{ perspective: 800 }}
-                className="relative w-36 h-36 z-10 pointer-events-none"
-            >
-                <div
-                    className="w-full h-full rounded-full relative overflow-hidden shadow-2xl"
-                    style={{
-                        background: `radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.1) 0%, ${colors[0]} 30%, ${colors[1]} 65%, ${colors[2]} 90%)`,
-                        boxShadow: `0 30px 60px ${colors[0]}60, 0 10px 30px ${colors[1]}40, inset 0 -10px 30px ${colors[2]}30`,
-                    }}
-                >
-                    <div className="absolute top-[12%] left-[20%] w-12 h-8 rounded-full bg-white/10 backdrop-blur-lg border border-white/20/60 blur-md" />
-                    <div className="absolute top-[22%] left-[28%] w-5 h-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20/80 blur-sm" />
-                    <motion.div
-                        animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.7, 1, 0.7] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' as const }}
-                        className="absolute inset-0 rounded-full"
-                        style={{ background: `radial-gradient(circle at center, ${colors[0]}80 0%, transparent 70%)` }}
-                    />
-                </div>
-                <motion.div
-                    animate={{ scaleX: active ? [1, 1.1, 1] : [0.85, 0.95, 0.85], opacity: [0.2, 0.3, 0.2] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' as const }}
-                    className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-4 rounded-full blur-xl pointer-events-none"
-                    style={{ background: colors[1] }}
-                />
-            </motion.div>
-
-            {/* Floating leaves / peace symbols */}
-            {hasInput && [...Array(6)].map((_, i) => {
-                const emojis = ['🌿', '✨', '🕊️', '🌸', '💜', '🌙']
-                return (
-                    <motion.div
-                        key={i}
-                        className="absolute text-base select-none pointer-events-none"
-                        style={{
-                            left: `${15 + (i * 14)}%`,
-                            bottom: `${20 + (i % 3) * 20}%`,
-                        }}
-                        initial={{ opacity: 0, y: 0, scale: 0.5 }}
-                        animate={{
-                            opacity: [0, 0.8, 0],
-                            y: [-20, -80],
-                            scale: [0.5, 1, 0.8],
-                            x: [0, (i % 2 === 0 ? 12 : -12)],
-                        }}
-                        transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' as const, delay: i * 0.5 }}
-                    >
-                        {emojis[i]}
-                    </motion.div>
-                )
-            })}
-        </div>
-    )
-}
-
-/* ─── MAIN COMPONENT ─── */
-
-export default function SignInPage({ onSignIn, initialMode = 'signup' }: SignInPageProps) {
-    const [isLogin, setIsLogin] = useState(initialMode === 'login')
+export default function SignInPage({ onSignIn }: SignInPageProps) {
     const [step, setStep] = useState(1)
-    const [isSuccess, setIsSuccess] = useState(false)
-
-    // Form fields
-    const [name, setName] = useState('')
-    const [selectedRole, setSelectedRole] = useState<'student' | 'admin' | 'therapist' | null>(null)
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [otp, setOtp] = useState('')
+    
+    // Step 2 details
+    const [name, setName] = useState('')
+    const [schoolNumber, setSchoolNumber] = useState('')
     const [college, setCollege] = useState('')
-    const [university, setUniversity] = useState('')
     const [year, setYear] = useState('')
-    const [branch, setBranch] = useState('')
-    const [phoneNumber, setPhoneNumber] = useState('')
-    const [speciality, setSpeciality] = useState('')
-
+    
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [focusedField, setFocusedField] = useState<string | null>(null)
+    const router = useRouter()
 
-    const canProceedStep1 = name.trim().length >= 2 && selectedRole !== null
-    const canProceedStep2 = email.trim().length > 3 && password.length >= 6 && password === confirmPassword
-    const canProceedStep3 = otp.length === 6
-    const hasAnyInput = name.trim().length > 0 || selectedRole !== null || email.trim().length > 0
-    const canLogin = email.trim().length > 3 && password.length >= 6
+    const canContinueStep1 = email.trim().length > 3 && email.includes('@')
+    const canContinueStep2 = name.trim().length > 1 && schoolNumber.trim().length > 0 && college.trim().length > 0
 
-    const handleMockSubmit = () => {
+    const handleContinueStep1 = () => {
         setIsSubmitting(true)
         setTimeout(() => {
             setIsSubmitting(false)
-            setIsSuccess(true)
-            const userInfo: UserInfo = {
-                name: isLogin ? 'Demo User' : name.trim(),
-                role: !isLogin && selectedRole ? selectedRole : 'student',
-                email: email.trim(),
-                college: college.trim() || undefined,
-                university: university.trim() || undefined,
-                year: year.trim() || undefined,
-                branch: branch.trim() || undefined,
-                phoneNumber: phoneNumber.trim() || undefined,
-                speciality: speciality.trim() || undefined
-            }
-            setTimeout(() => {
-                onSignIn(userInfo)
-            }, 1500)
+            setStep(2)
+        }, 600)
+    }
+
+    const handleComplete = () => {
+        setIsSubmitting(true)
+        setTimeout(() => {
+            setIsSubmitting(false)
+            onSignIn({
+                name: name,
+                role: 'student',
+                email: email,
+                schoolNumber: schoolNumber,
+                college: college,
+                year: year
+            })
+            router.push('/dashboard')
         }, 1000)
     }
 
-    // Handlers for switching mode
-    const toggleMode = () => {
-        setIsLogin(!isLogin)
-        setStep(1) // reset step
-        setIsSubmitting(false)
-        setFocusedField(null)
+    const handleSkip = () => {
+        router.push('/dashboard')
     }
 
-    const [isMobile, setIsMobile] = useState(false)
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 1024)
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
+    // Animation variants for aesthetic text reveal
+    const textVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: (i: number) => ({
+            opacity: 1,
+            y: 0,
+            transition: { delay: i * 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+        })
+    }
 
     return (
-        <div className="min-h-screen flex relative overflow-hidden bg-slate-900 bg-[url(/dashboard/hero-background.png)] bg-cover bg-center">
-            {/* Sliding Form Container */}
-            <motion.div
-                className="absolute lg:fixed top-0 w-full lg:w-1/2 h-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-16 py-12 z-20 bg-white/10 backdrop-blur-lg border border-white/20/10 backdrop-blur-2xl border-white/20 shadow-2xl lg:shadow-none overflow-y-auto"
-                initial={false}
-                animate={{
-                    left: isMobile ? '0%' : (isLogin ? '0%' : '50%'),
-                    borderTopRightRadius: isLogin ? '0px' : (isMobile ? '0px' : '40px'),
-                    borderBottomRightRadius: isLogin ? '0px' : (isMobile ? '0px' : '40px'),
-                    borderTopLeftRadius: isLogin ? (isMobile ? '0px' : '40px') : '0px',
-                    borderBottomLeftRadius: isLogin ? (isMobile ? '0px' : '40px') : '0px',
-                }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)' }}
-            >
-                {/* Visual decorators for Form side */}
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#8b5cf6 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
+        <div className="min-h-[100dvh] lg:min-h-0 lg:h-[100dvh] w-full relative flex flex-col lg:flex-row bg-[#e8f1f8] overflow-y-auto lg:overflow-hidden">
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0">
+                <motion.img 
+                    initial={{ scale: 1.05, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 1.5, ease: 'easeOut' }}
+                    src="/dashboard/login-bg-v2.png" 
+                    alt="Peaceful background" 
+                    className="w-full h-full object-cover"
+                />
+            </div>
 
-                <AnimatePresence>
-                    {hasAnyInput && !isSubmitting && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.5 }}
-                            className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center"
-                        >
-                            <BreathingOrb active={focusedField !== null} hasInput={hasAnyInput} step={step} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+            {/* Left Content */}
+            <div className="relative z-10 w-full lg:w-[55%] flex flex-col justify-between p-6 lg:p-16 h-auto pt-8 lg:pt-16 lg:h-full">
+                {/* Logo Area */}
+                <motion.div 
+                    custom={0} initial="hidden" animate="visible" variants={textVariants}
+                    className="flex items-center gap-3"
+                >
+                    <img 
+                        src="/dashboard/nav%20bar%20logo.svg" 
+                        alt="Peace Code Logo" 
+                        className="w-8 lg:w-10 h-auto brightness-0 opacity-90" 
+                    />
+                    <span 
+                        className="text-xl lg:text-3xl font-medium tracking-wide text-[#162758]" 
+                        style={{ fontFamily: "'Juana', serif", letterSpacing: '0.02em' }}
+                    >
+                        Peace Code
+                    </span>
+                </motion.div>
 
-                <AnimatePresence>
-                    {focusedField && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute top-0 right-0 w-64 h-64 rounded-full pointer-events-none"
-                            style={{ background: 'radial-gradient(circle, #ddd6fe40 0%, transparent 70%)' }}
-                        />
-                    )}
-                </AnimatePresence>
-
-                <div className="w-full max-w-md relative z-10 flex flex-col items-center">
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-8 hidden lg:block">
-                        <img src={logoImg} alt="Peace Code" className="h-10 w-auto drop-shadow-md" />
-                    </motion.div>
-
-                    {/* Dynamic Form Content */}
+                {/* Typography Area */}
+                <div className="mt-auto lg:mt-24 xl:mt-32 max-w-md xl:max-w-xl hidden lg:block pr-8">
                     <AnimatePresence mode="wait">
-                        {isSuccess ? (
-                            <motion.div key="success" {...fadeSlide} className="w-full flex flex-col items-center justify-center py-12">
-                                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
-                                    <CheckCircle2 className="w-10 h-10 text-green-500" />
-                                </div>
-                                <h2 className="text-2xl font-black text-white mb-2 text-center">
-                                    {isLogin ? "Welcome Back!" : "Account Created!"}
-                                </h2>
-                                <p className="text-sm text-slate-400 text-center mb-8">
-                                    {isLogin ? "You have successfully logged in." : "Your account has been created successfully."}
-                                </p>
-                                <button
-                                    className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center text-white transition-all duration-300 opacity-80 cursor-not-allowed"
-                                    style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)', boxShadow: '0 12px 30px #a78bfa60, 0 4px 12px #a78bfa40' }}
-                                    disabled
+                        {step === 1 ? (
+                            <motion.div
+                                key="text-step-1"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20, filter: 'blur(4px)' }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                            >
+                                <h1 
+                                    className={`text-5xl xl:text-7xl font-semibold text-[#162758] mb-4 xl:mb-6 leading-[1.15] tracking-tight ${playfair.className}`}
+                                    style={{ fontFamily: "'Juana', serif" }}
                                 >
-                                    <Sparkles className="w-5 h-5 animate-spin mr-2" />
-                                    Redirecting...
-                                </button>
-                            </motion.div>
-                        ) : isLogin ? (
-                            /* ── LOG IN FLOW ── */
-                            <motion.div key="login" {...fadeSlide} className="w-full">
-                                <h1 className="text-[26px] font-black text-white mb-1 leading-snug text-center">
-                                    Welcome Back
+                                    Find your <br/>
+                                    inner <span className="italic text-[#1e3b8a] font-light">peace.</span>
                                 </h1>
-                                <p className="text-sm text-slate-300 mb-8 font-medium text-center">Sign in to your account</p>
-
-                                <div className="space-y-4 mb-8">
-                                    {/* Email */}
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Email</label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                            <input
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                onFocus={() => setFocusedField('loginEmail')}
-                                                onBlur={() => setFocusedField(null)}
-                                                placeholder="you@example.com"
-                                                className="w-full pl-11 pr-4 py-4 rounded-2xl text-sm text-white placeholder-gray-300 font-medium outline-none transition-all duration-300"
-                                                style={{
-                                                    background: focusedField === 'loginEmail' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                                                    border: `2px solid ${focusedField === 'loginEmail' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}`,
-                                                    boxShadow: focusedField === 'loginEmail' ? '0 0 0 4px #ddd6fe60, 0 8px 25px #a78bfa20' : '0 2px 8px rgba(255, 255, 255, 0.2)40',
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    {/* Password */}
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Password</label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                            <input
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                onFocus={() => setFocusedField('loginPass')}
-                                                onBlur={() => setFocusedField(null)}
-                                                placeholder="••••••••"
-                                                className="w-full pl-11 pr-4 py-4 rounded-2xl text-sm text-white placeholder-gray-300 font-medium outline-none transition-all duration-300"
-                                                style={{
-                                                    background: focusedField === 'loginPass' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                                                    border: `2px solid ${focusedField === 'loginPass' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}`,
-                                                    boxShadow: focusedField === 'loginPass' ? '0 0 0 4px #ddd6fe60, 0 8px 25px #a78bfa20' : '0 2px 8px rgba(255, 255, 255, 0.2)40',
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="flex justify-end mt-2">
-                                            <button className="text-[11px] font-bold text-purple-500 hover:text-purple-600">Forgot password?</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <motion.button
-                                    whileHover={canLogin ? { scale: 1.02, y: -2 } : {}}
-                                    whileTap={canLogin ? { scale: 0.98 } : {}}
-                                    onClick={handleMockSubmit}
-                                    disabled={!canLogin || isSubmitting}
-                                    className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300`}
-                                    style={canLogin ? {
-                                        background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
-                                        boxShadow: '0 12px 30px #a78bfa60, 0 4px 12px #a78bfa40',
-                                        color: 'white',
-                                    } : {
-                                        background: 'rgba(255, 255, 255, 0.1)',
-                                        color: '#a78bfa',
-                                        cursor: 'not-allowed',
-                                    }}
-                                >
-                                    {isSubmitting ? <Sparkles className="w-5 h-5 animate-spin" /> : 'Log In'}
-                                </motion.button>
-
-                                <p className="text-sm text-center font-medium text-slate-400 mt-8">
-                                    Don't have an account? <button onClick={toggleMode} className="text-purple-600 font-bold hover:underline">Sign Up</button>
+                                <p className="text-[#162758]/75 text-lg xl:text-xl font-medium leading-relaxed max-w-md">
+                                    A sanctuary to pause, breathe, and reconnect with your true self.
                                 </p>
                             </motion.div>
                         ) : (
-                            /* ── SIGN UP FLOW ── */
-                            <div className="w-full flex flex-col items-center">
-                                {/* Step Indicator */}
-                                <div className="flex items-center gap-2 mb-8 relative z-10">
-                                    {[1, 2, 3, 4].map((s) => (
-                                        <div key={s} className="flex items-center gap-1">
-                                            <motion.div
-                                                animate={step === s ? { scale: [1, 1.15, 1] } : {}}
-                                                transition={{ duration: 0.4 }}
-                                                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${step > s
-                                                    ? 'bg-gradient-to-br from-purple-500 to-indigo-500 text-white shadow-md shadow-purple-200/60'
-                                                    : step === s
-                                                        ? 'bg-gradient-to-br from-purple-400 to-indigo-500 text-white shadow-md shadow-purple-200/60'
-                                                        : 'bg-purple-50 text-purple-300 border border-purple-100'
-                                                    }`}
-                                            >
-                                                {step > s ? <CheckCircle2 className="w-3.5 h-3.5" /> : s}
-                                            </motion.div>
-                                            {s < 4 && <div className={`w-6 h-px rounded-full transition-all duration-500 ${step > s ? 'bg-purple-400' : 'bg-purple-100'}`} />}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <AnimatePresence mode="wait">
-                                    {/* Sign Up Step 1 */}
-                                    {step === 1 && (
-                                        <motion.div key="step1" {...fadeSlide} className="w-full">
-                                            <h1 className="text-[26px] font-black text-white mb-1 leading-snug">
-                                                Create Account
-                                            </h1>
-                                            <p className="text-sm text-slate-300 mb-7 font-medium">Join us for your personalized workspace.</p>
-
-                                            <div className="mb-5">
-                                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Your Name</label>
-                                                <div className="relative">
-                                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                    <input
-                                                        type="text"
-                                                        value={name}
-                                                        onChange={(e) => setName(e.target.value)}
-                                                        onFocus={() => setFocusedField('name')}
-                                                        onBlur={() => setFocusedField(null)}
-                                                        placeholder="e.g. Arjun..."
-                                                        className="w-full pl-11 pr-4 py-4 rounded-2xl text-sm text-white placeholder-gray-300 font-medium outline-none transition-all duration-300"
-                                                        style={{
-                                                            background: focusedField === 'name' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                                                            border: `2px solid ${focusedField === 'name' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}`,
-                                                            boxShadow: focusedField === 'name' ? '0 0 0 4px #ddd6fe60, 0 8px 25px #a78bfa20' : '0 2px 8px rgba(255, 255, 255, 0.2)40',
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="mb-7">
-                                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-3">I am a...</label>
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    {roles.map((role) => {
-                                                        const Icon = role.icon
-                                                        const isSelected = selectedRole === role.id
-                                                        return (
-                                                            <button
-                                                                key={role.id}
-                                                                onClick={() => setSelectedRole(role.id)}
-                                                                className={`relative flex flex-col items-center p-3 rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden`}
-                                                                style={{
-                                                                    borderColor: isSelected ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)',
-                                                                    background: isSelected ? 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)' : 'rgba(255, 255, 255, 0.05)',
-                                                                    boxShadow: isSelected ? '0 8px 24px #ddd6fe60, 0 4px 8px #a78bfa30' : '0 2px 8px rgba(255, 255, 255, 0.2)40',
-                                                                }}
-                                                            >
-                                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2`}
-                                                                    style={{
-                                                                        background: isSelected ? `linear-gradient(135deg, ${role.gradient.includes('purple') ? '#a78bfa' : role.gradient.includes('indigo') ? '#818cf8' : '#a78bfa'} 0%, #7c3aed 100%)` : 'rgba(255, 255, 255, 0.1)',
-                                                                    }}
-                                                                >
-                                                                    <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-purple-400'}`} />
-                                                                </div>
-                                                                <span className={`text-xs font-bold ${isSelected ? 'text-purple-800' : 'text-slate-400'}`}>{role.label}</span>
-                                                            </button>
-                                                        )
-                                                    })}
-                                                </div>
-                                            </div>
-
-                                            <motion.button
-                                                whileHover={canProceedStep1 ? { scale: 1.02, y: -2 } : {}}
-                                                whileTap={canProceedStep1 ? { scale: 0.98 } : {}}
-                                                onClick={() => canProceedStep1 && setStep(2)}
-                                                disabled={!canProceedStep1}
-                                                className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300`}
-                                                style={canProceedStep1 ? { background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)', boxShadow: '0 12px 30px #a78bfa60, 0 4px 12px #a78bfa40', color: 'white' } : { background: 'rgba(255, 255, 255, 0.1)', color: '#a78bfa', cursor: 'not-allowed' }}
-                                            >
-                                                Continue <ArrowRight className="w-4 h-4" />
-                                            </motion.button>
-                                        </motion.div>
-                                    )}
-
-                                    {/* Sign Up Step 2 */}
-                                    {step === 2 && (
-                                        <motion.div key="step2" {...fadeSlide} className="w-full">
-                                            <button onClick={() => setStep(1)} className="flex items-center gap-1.5 text-sm text-slate-300 hover:text-purple-600 transition-colors mb-5 font-medium">
-                                                <ArrowLeft className="w-3.5 h-3.5" /> Back
-                                            </button>
-                                            <h1 className="text-[24px] font-black text-white mb-4">Account Details</h1>
-
-                                            <div className="space-y-4 mb-7">
-                                                <div>
-                                                    <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">{selectedRole === 'student' ? 'College Email' : 'Email Address'}</label>
-                                                    <div className="relative">
-                                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)} placeholder="you@example.edu" className="w-full pl-11 pr-4 py-4 rounded-2xl text-sm text-white placeholder-gray-300 font-medium outline-none transition-all duration-300" style={{ background: focusedField === 'email' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'email' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Password</label>
-                                                    <div className="relative">
-                                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onFocus={() => setFocusedField('pass')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className="w-full pl-11 pr-4 py-4 rounded-2xl text-sm text-white placeholder-gray-300 font-medium outline-none transition-all duration-300" style={{ background: focusedField === 'pass' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'pass' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Confirm Password</label>
-                                                    <div className="relative">
-                                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onFocus={() => setFocusedField('cpass')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className="w-full pl-11 pr-4 py-4 rounded-2xl text-sm text-white placeholder-gray-300 font-medium outline-none transition-all duration-300" style={{ background: focusedField === 'cpass' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'cpass' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <motion.button
-                                                whileHover={canProceedStep2 ? { scale: 1.02, y: -2 } : {}}
-                                                whileTap={canProceedStep2 ? { scale: 0.98 } : {}}
-                                                onClick={() => canProceedStep2 && setStep(3)}
-                                                disabled={!canProceedStep2}
-                                                className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300`}
-                                                style={canProceedStep2 ? { background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)', boxShadow: '0 12px 30px #a78bfa60, 0 4px 12px #a78bfa40', color: 'white' } : { background: 'rgba(255, 255, 255, 0.1)', color: '#a78bfa', cursor: 'not-allowed' }}
-                                            >
-                                                Send OTP <ArrowRight className="w-4 h-4" />
-                                            </motion.button>
-
-                                            <button
-                                                onClick={handleMockSubmit}></button>
-                                        </motion.div>
-                                    )}
-
-                                    {/* Sign Up Step 3 (OTP) */}
-                                    {step === 3 && (
-                                        <motion.div key="step3" {...fadeSlide} className="w-full">
-                                            <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-sm text-slate-300 hover:text-purple-600 transition-colors mb-5 font-medium">
-                                                <ArrowLeft className="w-3.5 h-3.5" /> Back
-                                            </button>
-                                            <h1 className="text-[24px] font-black text-white mb-2">Verify Email</h1>
-                                            <p className="text-sm text-slate-300 mb-7 font-medium">We've sent a 6-digit code to {email}</p>
-
-                                            <div className="mb-7">
-                                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Verification Code</label>
-                                                <div className="relative">
-                                                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                    <input
-                                                        type="text"
-                                                        maxLength={6}
-                                                        value={otp}
-                                                        onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                                                        onFocus={() => setFocusedField('otp')}
-                                                        onBlur={() => setFocusedField(null)}
-                                                        placeholder="123456"
-                                                        className="w-full pl-11 pr-4 py-4 rounded-2xl text-2xl tracking-[0.5em] text-center font-bold text-white placeholder-gray-300 outline-none transition-all duration-300"
-                                                        style={{ background: focusedField === 'otp' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'otp' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <motion.button
-                                                whileHover={canProceedStep3 ? { scale: 1.02, y: -2 } : {}}
-                                                whileTap={canProceedStep3 ? { scale: 0.98 } : {}}
-                                                onClick={() => canProceedStep3 && setStep(4)}
-                                                disabled={!canProceedStep3}
-                                                className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300`}
-                                                style={canProceedStep3 ? { background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)', boxShadow: '0 12px 30px #a78bfa60, 0 4px 12px #a78bfa40', color: 'white' } : { background: 'rgba(255, 255, 255, 0.1)', color: '#a78bfa', cursor: 'not-allowed' }}
-                                            >
-                                                Verify <ArrowRight className="w-4 h-4" />
-                                            </motion.button>
-
-                                            <button
-                                                onClick={handleMockSubmit}></button>
-                                        </motion.div>
-                                    )}
-
-                                    {/* Sign Up Step 4 */}
-                                    {step === 4 && (
-                                        <motion.div key="step4" {...fadeSlide} className="w-full">
-                                            <button onClick={() => setStep(3)} className="flex items-center gap-1.5 text-sm text-slate-300 hover:text-purple-600 transition-colors mb-5 font-medium">
-                                                <ArrowLeft className="w-3.5 h-3.5" /> Back
-                                            </button>
-                                            <h1 className="text-[24px] font-black text-white mb-4">Final Details 👋</h1>
-
-                                            <div className="space-y-4 mb-7 max-h-[40vh] overflow-y-auto px-1 hide-scrollbar">
-                                                {selectedRole === 'student' && (
-                                                    <>
-                                                        <div>
-                                                            <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">College</label>
-                                                            <div className="relative">
-                                                                <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                                <input type="text" value={college} onChange={(e) => setCollege(e.target.value)} onFocus={() => setFocusedField('col')} onBlur={() => setFocusedField(null)} placeholder="e.g. IIT Delhi" className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm outline-none transition-all" style={{ background: focusedField === 'col' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'col' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">University</label>
-                                                            <div className="relative">
-                                                                <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                                <input type="text" value={university} onChange={(e) => setUniversity(e.target.value)} onFocus={() => setFocusedField('uni')} onBlur={() => setFocusedField(null)} placeholder="Enter University" className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm outline-none transition-all" style={{ background: focusedField === 'uni' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'uni' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-4">
-                                                            <div>
-                                                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Year</label>
-                                                                <input type="text" value={year} onChange={(e) => setYear(e.target.value)} onFocus={() => setFocusedField('yr')} onBlur={() => setFocusedField(null)} placeholder="e.g. 2nd Year" className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all" style={{ background: focusedField === 'yr' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'yr' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Branch</label>
-                                                                <input type="text" value={branch} onChange={(e) => setBranch(e.target.value)} onFocus={() => setFocusedField('br')} onBlur={() => setFocusedField(null)} placeholder="e.g. CSE" className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all" style={{ background: focusedField === 'br' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'br' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Phone Number</label>
-                                                            <div className="relative">
-                                                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                                <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} onFocus={() => setFocusedField('ph')} onBlur={() => setFocusedField(null)} placeholder="+91 XXXXX XXXXX" className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm outline-none transition-all" style={{ background: focusedField === 'ph' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'ph' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                )}
-
-                                                {selectedRole === 'admin' && (
-                                                    <div>
-                                                        <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Admin Access Code</label>
-                                                        <div className="relative">
-                                                            <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                            <input type="text" placeholder="Enter your admin code..." onFocus={() => setFocusedField('code')} onBlur={() => setFocusedField(null)} className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm text-white outline-none transition-all" style={{ background: focusedField === 'code' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'code' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {selectedRole === 'therapist' && (
-                                                    <div>
-                                                        <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-[0.12em] mb-2">Speciality</label>
-                                                        <div className="relative">
-                                                            <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300" />
-                                                            <input type="text" value={speciality} onChange={(e) => setSpeciality(e.target.value)} onFocus={() => setFocusedField('spec')} onBlur={() => setFocusedField(null)} placeholder="e.g. CBT, Anxiety..." className="w-full pl-11 pr-4 py-3 rounded-2xl text-sm text-white outline-none transition-all" style={{ background: focusedField === 'spec' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)', border: `2px solid ${focusedField === 'spec' ? '#a78bfa' : 'rgba(255, 255, 255, 0.2)'}` }} />
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <motion.button
-                                                whileHover={{ scale: 1.02, y: -2 }}
-                                                whileTap={{ scale: 0.98 }}
-                                                onClick={handleMockSubmit}
-                                                disabled={isSubmitting}
-                                                className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 text-white transition-all duration-300"
-                                                style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)', boxShadow: '0 12px 30px #a78bfa60, 0 4px 12px #a78bfa40' }}
-                                            >
-                                                {isSubmitting ? <Sparkles className="w-5 h-5 animate-spin" /> : 'Complete Sign Up'}
-                                            </motion.button>
-
-                                            <button
-                                                onClick={handleMockSubmit}
-                                                className="w-full mt-3 text-xs text-slate-300 hover:text-purple-500 transition-colors font-medium text-center"
-                                            >
-                                                Skip to Dashboard
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                {step === 1 && (
-                                    <p className="text-sm text-center font-medium text-slate-400 mt-8">
-                                        Already have an account? <button onClick={toggleMode} className="text-purple-600 font-bold hover:underline">Log In</button>
-                                    </p>
-                                )}
-                            </div>
+                            <motion.div
+                                key="text-step-2"
+                                initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+                                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                            >
+                                <h1 
+                                    className={`text-5xl xl:text-7xl font-semibold text-[#162758] mb-4 xl:mb-6 leading-[1.15] tracking-tight ${playfair.className}`}
+                                    style={{ fontFamily: "'Juana', serif" }}
+                                >
+                                    Shape your <br/>
+                                    own <span className="italic text-[#1e3b8a] font-light">path.</span>
+                                </h1>
+                                <p className="text-[#162758]/75 text-lg xl:text-xl font-medium leading-relaxed max-w-md">
+                                    Let us personalize your experience as your journey begins.
+                                </p>
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
-                <p className="text-[11px] text-slate-400 mt-8 text-center relative z-10 hidden lg:block">
-                    Built with 💜 for campus mental wellness · peacecode.in
-                </p>
-            </motion.div>
-
-            {/* Sliding Image/Branding Container */}
-            <motion.div
-                className="hidden lg:flex absolute top-0 w-1/2 h-full bg-white/10 backdrop-blur-lg border border-white/20 p-16 flex-col overflow-hidden z-10"
-                initial={false}
-                animate={{ left: isLogin ? '50%' : '0%' }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-                <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-                    <div className="absolute -top-[10%] -left-[10%] w-[600px] h-[600px] rounded-full bg-blue-50/50 blur-[100px]" />
-                    <div className="absolute -bottom-[10%] -right-[10%] w-[500px] h-[500px] rounded-full bg-indigo-50/40 blur-[100px]" />
-                    <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-                </div>
-
-                <div className="relative z-20 flex items-center gap-3 mb-16">
-                    <img src={logoImg} alt="Peace Code" className="h-10 w-auto" />
-                    <div className="px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Beta Access</span>
+                {/* Bottom Left Badge */}
+                <motion.div 
+                    custom={3} initial="hidden" animate="visible" variants={textVariants}
+                    className="mt-auto hidden lg:flex items-center gap-4 bg-white/30 backdrop-blur-md border border-white/40 p-4 rounded-3xl w-max shadow-sm"
+                >
+                    <div className="w-12 h-12 rounded-full border border-[#1e3b8a]/20 bg-white/40 flex items-center justify-center shrink-0">
+                        <ShieldCheck className="w-5 h-5 text-[#1e3b8a]" />
                     </div>
-                </div>
-
-                <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center">
-                    <div className="max-w-2xl mb-12">
-                        <motion.h1
-                            key={isLogin ? 'login-text' : 'signup-text'}
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="text-4xl xl:text-5xl font-bold text-slate-900 leading-tight mb-4"
-                        >
-                            {isLogin ? 'Welcome back to ' : 'Your Journey to '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                                {isLogin ? 'Peace Code' : 'Mental Excellence'}
-                            </span>
-                        </motion.h1>
-
-                        <p className="text-slate-500 text-lg max-w-lg mx-auto transition-opacity duration-300">
-                            {isLogin ? 'Pick up right where you left off.' : 'The comprehensive wellness platform built for campus life.'}
-                        </p>
+                    <div className="flex flex-col pr-4">
+                        <span className="text-[#162758] font-semibold text-sm tracking-wide">Private. Secure. Always.</span>
+                        <span className="text-[#162758]/70 text-xs mt-0.5">Your data is safe with us.</span>
                     </div>
+                </motion.div>
+            </div>
 
-                    <div className="relative w-full flex-1 flex flex-col items-center justify-end">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1 }}
-                            className="relative w-[90%] h-[85%] flex items-end justify-center"
-                        >
-                            <img
-                                src={mascotSvg}
-                                alt="Wellness Journey"
-                                className="w-full h-full object-contain object-bottom select-none pointer-events-none filter drop-shadow-[0_20px_50px_rgba(79,70,229,0.15)]"
+            {/* Right Content (Glass Panel) */}
+            <div className="relative z-10 w-full lg:w-[45%] flex items-center justify-center p-4 lg:p-12 pb-8 h-auto flex-1 lg:h-full">
+                <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full max-w-[460px] bg-white/40 backdrop-blur-2xl border border-white/60 shadow-[0_16px_64px_rgba(30,59,138,0.1)] rounded-[32px] lg:rounded-[40px] p-6 lg:p-10 relative flex flex-col max-h-full overflow-y-auto hide-scrollbar"
+                >
+                    <div className="flex justify-center mb-6 shrink-0">
+                        <div className="w-12 h-12 bg-white/60 rounded-full flex items-center justify-center border border-white/50 shadow-sm">
+                            <img 
+                                src="/dashboard/nav%20bar%20logo.svg" 
+                                alt="Peace Code Logo" 
+                                className="w-6 h-auto brightness-0 opacity-80" 
                             />
-
-                            <motion.div
-                                animate={{ y: [0, -10, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const }}
-                                className={`absolute top-[15%] ${isLogin ? 'right-[5%]' : 'left-[5%]'} p-5 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20/80 backdrop-blur-md shadow-2xl border border-white/50 max-w-[220px] text-left`}
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Growth Mindset</span>
-                                </div>
-                                <p className="text-slate-700 text-xs font-semibold leading-relaxed">
-                                    "Your presence makes a difference. Start your mindful session today."
-                                </p>
-                            </motion.div>
-                        </motion.div>
-
-                        <div className="w-full relative mt-[-2px]">
-                            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent opacity-50" />
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-white/10 backdrop-blur-lg border border-white/20 flex items-center gap-8 whitespace-nowrap">
-                                {[{ text: 'Privacy First', icon: ShieldCheck }, { text: 'Expert Guided', icon: User }, { text: '24/7 Access', icon: Sparkles }].map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 group">
-                                        <item.icon className="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition-transform" />
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">{item.text}</span>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </div>
-                </div>
+                    
+                    <h2 
+                        className={`text-2xl lg:text-3xl text-center text-[#162758] font-medium mb-2 shrink-0 ${playfair.className}`}
+                        style={{ fontFamily: "'Juana', serif" }}
+                    >
+                        {step === 1 ? 'Welcome to Peace Code' : 'A few more details'}
+                    </h2>
+                    <p className="text-center text-[#162758]/70 text-sm mb-8 shrink-0 font-light">
+                        {step === 1 
+                            ? <span dangerouslySetInnerHTML={{ __html: "Let's begin your journey<br/>towards peace of mind." }} />
+                            : 'Help us personalize your dashboard experience.'
+                        }
+                    </p>
 
-                <div className="relative z-20 mt-8 pt-6 border-t border-slate-50 flex justify-between items-center text-[9px] text-slate-300 font-bold uppercase tracking-[0.15em]">
-                    <span>© 2026 PEACE CODE ECOSYSTEM</span>
-                    <div className="flex gap-6">
-                        <span className="hover:text-blue-500 cursor-pointer transition-colors">Privacy</span>
-                        <span className="hover:text-blue-500 cursor-pointer transition-colors">Terms</span>
-                        <span className="hover:text-blue-500 cursor-pointer transition-colors">Security</span>
+                    {/* Progress indicator */}
+                    <div className="mb-8 shrink-0">
+                        <div className="flex justify-between items-end mb-2">
+                            <p className="text-[#1e3b8a] font-medium text-xs">Step {step} of 2</p>
+                            <p className="text-[#1e3b8a]/60 text-[10px]">{step === 1 ? 'Email' : 'Details'}</p>
+                        </div>
+                        <div className="w-full h-1 bg-[#1e3b8a]/10 rounded-full overflow-hidden">
+                            <motion.div 
+                                className="h-full bg-[#1e3b8a] rounded-full"
+                                initial={{ width: '50%' }}
+                                animate={{ width: step === 1 ? '50%' : '100%' }}
+                                transition={{ duration: 0.6, ease: "easeOut" }}
+                            />
+                        </div>
                     </div>
-                </div>
-            </motion.div>
+
+                    <div className="flex-1 overflow-y-auto hide-scrollbar shrink-0 mb-4 px-1 pb-1">
+                        <AnimatePresence mode="wait">
+                            {step === 1 ? (
+                                <motion.div 
+                                    key="step1"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 10 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <h3 className="text-[#162758] font-medium text-sm mb-1.5">Enter your student email ID</h3>
+                                    <p className="text-[#162758]/60 text-xs mb-4 font-light">
+                                        We'll send you to the next step based on your registration status.
+                                    </p>
+
+                                    <div className="relative group">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-[#1e3b8a]/40 group-focus-within:text-[#1e3b8a] transition-colors" />
+                                        <input 
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="name@university.edu"
+                                            className="w-full pl-11 pr-4 py-3 lg:pl-12 lg:py-3.5 rounded-2xl border border-white/60 bg-white/50 text-sm text-[#162758] placeholder-[#162758]/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] outline-none focus:bg-white/80 focus:border-[#1e3b8a]/30 focus:ring-4 focus:ring-[#1e3b8a]/10 transition-all duration-300"
+                                        />
+                                    </div>
+                                    
+                                    {/* Info Cards (Step 1 only) */}
+                                    <div className="mt-6 space-y-3">
+                                        <div className="bg-white/40 border border-white/60 rounded-2xl p-4 flex gap-3.5 items-start hover:bg-white/50 transition-colors">
+                                            <div className="w-8 h-8 rounded-full bg-white/80 border border-white shadow-sm flex items-center justify-center shrink-0">
+                                                <User className="w-4 h-4 text-[#1e3b8a]" />
+                                            </div>
+                                            <div className="mt-0.5">
+                                                <h4 className="text-[#162758] font-medium text-xs">Already registered?</h4>
+                                                <p className="text-[#162758]/60 text-[11px] mt-1 font-light">You'll be redirected to the login page.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white/40 border border-white/60 rounded-2xl p-4 flex gap-3.5 items-start hover:bg-white/50 transition-colors">
+                                            <div className="w-8 h-8 rounded-full bg-white/80 border border-white shadow-sm flex items-center justify-center shrink-0">
+                                                <Sparkles className="w-4 h-4 text-[#1e3b8a]" />
+                                            </div>
+                                            <div className="mt-0.5">
+                                                <h4 className="text-[#162758] font-medium text-xs">New here?</h4>
+                                                <p className="text-[#162758]/60 text-[11px] mt-1 font-light">You'll be guided through a quick sign up.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <motion.div 
+                                    key="step2"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 10 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="space-y-4"
+                                >
+                                    <div>
+                                        <label className="block text-[#162758] font-medium text-xs mb-1.5 ml-1">Full Name</label>
+                                        <div className="relative group">
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1e3b8a]/40 group-focus-within:text-[#1e3b8a] transition-colors" />
+                                            <input 
+                                                type="text"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                placeholder="e.g. Aditi Sharma"
+                                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-white/60 bg-white/50 text-sm text-[#162758] placeholder-[#162758]/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] outline-none focus:bg-white/80 focus:border-[#1e3b8a]/30 focus:ring-4 focus:ring-[#1e3b8a]/10 transition-all duration-300"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-[#162758] font-medium text-xs mb-1.5 ml-1">School / Roll Number</label>
+                                        <div className="relative group">
+                                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1e3b8a]/40 group-focus-within:text-[#1e3b8a] transition-colors" />
+                                            <input 
+                                                type="text"
+                                                value={schoolNumber}
+                                                onChange={(e) => setSchoolNumber(e.target.value)}
+                                                placeholder="e.g. 21BCE1234"
+                                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-white/60 bg-white/50 text-sm text-[#162758] placeholder-[#162758]/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] outline-none focus:bg-white/80 focus:border-[#1e3b8a]/30 focus:ring-4 focus:ring-[#1e3b8a]/10 transition-all duration-300"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-[#162758] font-medium text-xs mb-1.5 ml-1">College / University</label>
+                                        <div className="relative group">
+                                            <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1e3b8a]/40 group-focus-within:text-[#1e3b8a] transition-colors" />
+                                            <input 
+                                                type="text"
+                                                value={college}
+                                                onChange={(e) => setCollege(e.target.value)}
+                                                placeholder="e.g. IIT Delhi"
+                                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-white/60 bg-white/50 text-sm text-[#162758] placeholder-[#162758]/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] outline-none focus:bg-white/80 focus:border-[#1e3b8a]/30 focus:ring-4 focus:ring-[#1e3b8a]/10 transition-all duration-300"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[#162758] font-medium text-xs mb-1.5 ml-1">Year of Study</label>
+                                        <div className="relative group">
+                                            <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1e3b8a]/40 group-focus-within:text-[#1e3b8a] transition-colors" />
+                                            <input 
+                                                type="text"
+                                                value={year}
+                                                onChange={(e) => setYear(e.target.value)}
+                                                placeholder="e.g. 2nd Year"
+                                                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-white/60 bg-white/50 text-sm text-[#162758] placeholder-[#162758]/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] outline-none focus:bg-white/80 focus:border-[#1e3b8a]/30 focus:ring-4 focus:ring-[#1e3b8a]/10 transition-all duration-300"
+                                            />
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    <div className="shrink-0 mt-4">
+                        {step === 1 ? (
+                            <button
+                                onClick={handleContinueStep1}
+                                disabled={!canContinueStep1 || isSubmitting}
+                                className={`w-full py-3.5 lg:py-4 rounded-2xl text-white font-medium flex items-center justify-center gap-2 transition-all duration-300 ${
+                                    canContinueStep1 
+                                    ? 'bg-[#1e3b8a] hover:bg-[#162758] hover:shadow-lg hover:shadow-[#1e3b8a]/30 hover:-translate-y-0.5' 
+                                    : 'bg-[#1e3b8a]/40 cursor-not-allowed text-white/70'
+                                }`}
+                            >
+                                {isSubmitting ? <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 animate-spin" /> : 'Continue'} 
+                                {!isSubmitting && <ArrowRight className="w-4 h-4" />}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleComplete}
+                                disabled={!canContinueStep2 || isSubmitting}
+                                className={`w-full py-3.5 lg:py-4 rounded-2xl text-white font-medium flex items-center justify-center gap-2 transition-all duration-300 ${
+                                    canContinueStep2 
+                                    ? 'bg-[#1e3b8a] hover:bg-[#162758] hover:shadow-lg hover:shadow-[#1e3b8a]/30 hover:-translate-y-0.5' 
+                                    : 'bg-[#1e3b8a]/40 cursor-not-allowed text-white/70'
+                                }`}
+                            >
+                                {isSubmitting ? <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 animate-spin" /> : 'Enter Dashboard'} 
+                                {!isSubmitting && <ArrowRight className="w-4 h-4" />}
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="mt-6 flex justify-center shrink-0">
+                        {step === 1 ? (
+                            <button 
+                                onClick={handleSkip}
+                                className="text-[#162758]/60 hover:text-[#1e3b8a] text-xs font-medium underline underline-offset-4 transition-colors hover:underline-offset-8"
+                            >
+                                Skip for now
+                            </button>
+                        ) : (
+                            <button 
+                                onClick={() => setStep(1)}
+                                className="text-[#162758]/60 hover:text-[#1e3b8a] text-xs font-medium underline underline-offset-4 transition-colors hover:underline-offset-8"
+                            >
+                                Back to Email
+                            </button>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
         </div>
     )
 }
