@@ -59,12 +59,19 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
                 college: college,
                 year: year
             })
-            router.push('/dashboard')
         }, 1000)
     }
 
     const handleSkip = () => {
-        router.push('/dashboard')
+        setIsSubmitting(true)
+        setTimeout(() => {
+            setIsSubmitting(false)
+            onSignIn({
+                name: name || 'Guest Student',
+                role: 'student',
+                email: email || 'guest@peacecode.in'
+            })
+        }, 600)
     }
 
     // Animation variants for aesthetic text reveal
