@@ -76,7 +76,11 @@ export const DesktopSidebar = ({
     return (
         <motion.div
             className={cn(
-                'h-full py-4 hidden md:flex md:flex-col bg-white/80 backdrop-blur-xl border-r border-purple-100/40 flex-shrink-0 overflow-hidden',
+                'h-full py-4 hidden md:flex md:flex-col flex-shrink-0 overflow-hidden',
+                'bg-[linear-gradient(135deg,oklch(1_0_0/72%),oklch(1_0_0/40%)_50%,oklch(1_0_0/20%))]',
+                'backdrop-blur-[24px] saturate-[1.15]',
+                'border-r border-[oklch(0.929_0.013_255.508/40%)]',
+                'shadow-[inset_0_1px_0_oklch(1_0_0/72%),4px_0_30px_oklch(0.42_0.06_292/4%)]',
                 className
             )}
             animate={{
@@ -109,7 +113,7 @@ export const MobileSidebar = ({
                         exit={{ x: '-100%', opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' as const }}
                         className={cn(
-                            'fixed h-full w-full inset-0 bg-white shadow-2xl z-[100] flex flex-col',
+                            'fixed h-full w-full inset-0 bg-[oklch(0.99_0.003_260)] shadow-2xl z-[100] flex flex-col',
                             className
                         )}
                     >
@@ -146,8 +150,8 @@ export const SidebarLink = ({
                 'flex items-center gap-2 group/sidebar py-2.5 rounded-xl transition-all duration-300 w-full text-left relative',
                 open ? 'justify-start px-3' : 'justify-center px-0',
                 active
-                    ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg shadow-purple-200/60'
-                    : 'text-gray-600 hover:bg-purple-50/70 hover:text-purple-700',
+                    ? 'bg-[oklch(0.208_0.042_265.755)] text-white shadow-[0_4px_20px_oklch(0.208_0.042_265.755/25%)]'
+                    : 'text-[oklch(0.45_0.03_260)] hover:bg-[oklch(0.968_0.007_247.896)] hover:text-[oklch(0.208_0.042_265.755)]',
                 className
             )}
         >
@@ -159,7 +163,7 @@ export const SidebarLink = ({
                 }}
                 className={cn(
                     'text-sm font-medium whitespace-pre inline-block !p-0 !m-0 transition duration-150',
-                    active ? 'text-white' : 'text-gray-700 group-hover/sidebar:translate-x-1'
+                    active ? 'text-white' : 'text-[oklch(0.35_0.03_260)] group-hover/sidebar:translate-x-1'
                 )}
             >
                 {link.label}

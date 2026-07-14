@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, Mail, ShieldCheck, User, Sparkles, Building, Hash, GraduationCap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -23,9 +23,10 @@ interface SignInPageProps {
     initialMode?: 'login' | 'signup'
 }
 
-export default function SignInPage({ onSignIn }: SignInPageProps) {
+export default function SignInPage({ onSignIn, initialMode }: SignInPageProps) {
     const [step, setStep] = useState(1)
     const [email, setEmail] = useState('')
+    const [isSignup, setIsSignup] = useState(initialMode === 'signup')
     
     // Step 2 details
     const [name, setName] = useState('')
@@ -35,6 +36,13 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
     
     const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter()
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search)
+        if (params.get('mode') === 'signup') {
+            setIsSignup(true)
+        }
+    }, [])
 
     const canContinueStep1 = email.trim().length > 3 && email.includes('@')
     const canContinueStep2 = name.trim().length > 1 && schoolNumber.trim().length > 0 && college.trim().length > 0
@@ -200,11 +208,11 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
                         className={`text-2xl lg:text-3xl text-center text-[#162758] font-medium mb-2 shrink-0 ${playfair.className}`}
                         style={{ fontFamily: "'Juana', serif" }}
                     >
-                        {step === 1 ? 'Welcome to Peace Code' : 'A few more details'}
+                        {step === 1 ? (isSignup ? 'Create your account' : 'Welcome to Peace Code') : 'A few more details'}
                     </h2>
                     <p className="text-center text-[#162758]/70 text-sm mb-8 shrink-0 font-light">
                         {step === 1 
-                            ? <span dangerouslySetInnerHTML={{ __html: "Let's begin your journey<br/>towards peace of mind." }} />
+                            ? <span dangerouslySetInnerHTML={{ __html: isSignup ? "Join us to begin your journey<br/>towards peace of mind." : "Let's begin your journey<br/>towards peace of mind." }} />
                             : 'Help us personalize your dashboard experience.'
                         }
                     </p>
@@ -373,7 +381,7 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
                         )}
                     </div>
 
-                    <div className="mt-6 flex justify-center shrink-0">
+                    <div className="mt-6 flex flex-col items-center gap-4 shrink-0">
                         {step === 1 ? (
                             <button 
                                 onClick={handleSkip}
@@ -389,6 +397,12 @@ export default function SignInPage({ onSignIn }: SignInPageProps) {
                                 Back to Email
                             </button>
                         )}
+                        <a 
+                            href="https://peacecode.in"
+                            className="text-[#162758]/50 hover:text-[#1e3b8a] text-[11px] font-medium transition-colors"
+                        >
+                            ← Back to peacecode.in
+                        </a>
                     </div>
                 </motion.div>
             </div>

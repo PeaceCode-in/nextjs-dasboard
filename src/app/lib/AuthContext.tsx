@@ -42,9 +42,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         document.cookie = `peacecode_role=${userInfo.role}; path=/; max-age=86400; SameSite=Lax`
         document.cookie = `peacecode_auth=1; path=/; max-age=86400; SameSite=Lax`
         
-        if (userInfo.role === 'admin') router.push('/admin/dashboard')
-        else if (userInfo.role === 'therapist') router.push('/therapist/dashboard')
-        else router.push('/dashboard')
+        const params = new URLSearchParams(window.location.search)
+        const redirect = params.get('redirect')
+        if (redirect && redirect.startsWith('/')) {
+            router.push(redirect)
+        } else {
+            if (userInfo.role === 'admin') router.push('/admin/dashboard')
+            else if (userInfo.role === 'therapist') router.push('/therapist/dashboard')
+            else router.push('/dashboard')
+        }
     }, [router])
 
     const logout = useCallback(() => {
@@ -52,8 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem(STORAGE_KEY)
         document.cookie = 'peacecode_auth=; path=/; max-age=0'
         document.cookie = 'peacecode_role=; path=/; max-age=0'
-        const landingPageUrl = process.env.NODE_ENV === 'production' ? 'https://peacecode.in' : 'http://localhost:3000'
-        window.location.href = landingPageUrl
+        window.location.href = 'https://peacecode.in'
     }, [])
 
     return (

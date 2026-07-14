@@ -77,7 +77,7 @@ function SidebarContent({ userName, userCollege }: { userName?: string; userColl
                         </div>
                     ) : (
                         <div className="flex items-center justify-center py-3">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-200/50">
+                            <div className="w-8 h-8 rounded-xl bg-[oklch(0.208_0.042_265.755)] flex items-center justify-center shadow-[0_4px_16px_oklch(0.208_0.042_265.755/20%)]">
                                 <Sparkles className="w-4 h-4 text-white" />
                             </div>
                         </div>
@@ -88,7 +88,7 @@ function SidebarContent({ userName, userCollege }: { userName?: string; userColl
                         <div key={section.category}>
                             <motion.p
                                 animate={{ opacity: open ? 1 : 0, height: open ? 'auto' : 0 }}
-                                className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.1em] px-3 mb-1.5 overflow-hidden"
+                                className="text-[10px] font-semibold text-[oklch(0.554_0.046_257.417)] uppercase tracking-[0.1em] px-3 mb-1.5 overflow-hidden"
                             >
                                 {section.category}
                             </motion.p>
@@ -99,7 +99,7 @@ function SidebarContent({ userName, userCollege }: { userName?: string; userColl
                                     const link: SidebarLinkItem = {
                                         label: item.label,
                                         id: item.id,
-                                        icon: <Icon className={cn('w-[18px] h-[18px] flex-shrink-0 transition-colors duration-300', active ? 'text-white' : 'text-gray-400 group-hover/sidebar:text-purple-500')} />,
+                                        icon: <Icon className={cn('w-[18px] h-[18px] flex-shrink-0 transition-colors duration-300', active ? 'text-white' : 'text-[oklch(0.554_0.046_257.417)] group-hover/sidebar:text-[oklch(0.208_0.042_265.755)]')} />,
                                     }
                                     return (
                                         <SidebarLink key={item.id} link={link} active={active} onClick={() => router.push(item.path)} />
@@ -112,26 +112,36 @@ function SidebarContent({ userName, userCollege }: { userName?: string; userColl
             </div>
             <div className="mt-auto">
                 <motion.div animate={{ opacity: open ? 1 : 0, height: open ? 'auto' : 0 }} className="overflow-hidden">
-                    <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100/50 mt-4">
-                        <p className="text-sm font-semibold text-purple-800 mb-1">Need help now?</p>
-                        <p className="text-xs text-purple-600/70 mb-3 leading-relaxed">Talk to someone who understands</p>
-                        <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium shadow-lg shadow-purple-200/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-1.5">
+                    <div className="p-3 rounded-2xl bg-[oklch(0.968_0.007_247.896)] border border-[oklch(0.929_0.013_255.508)] mt-4">
+                        <p className="text-sm font-semibold text-[oklch(0.208_0.042_265.755)] mb-1">Need help now?</p>
+                        <p className="text-xs text-[oklch(0.554_0.046_257.417)] mb-3 leading-relaxed">Talk to someone who understands</p>
+                        <button className="w-full py-2.5 rounded-xl bg-[oklch(0.208_0.042_265.755)] text-white text-sm font-medium shadow-[0_4px_16px_oklch(0.208_0.042_265.755/25%)] hover:shadow-[0_8px_24px_oklch(0.208_0.042_265.755/35%)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-1.5">
                             <Phone className="w-3.5 h-3.5" /> Crisis Support
                         </button>
                     </div>
                 </motion.div>
                 {!open ? (
                     <div className="flex justify-center pt-4">
-                        <button onClick={() => router.push('/profile')} className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300">{initials}</button>
+                        <button onClick={() => router.push('/profile')} className="w-9 h-9 rounded-xl bg-[oklch(0.208_0.042_265.755)] flex items-center justify-center text-white text-sm font-bold shadow-[0_4px_16px_oklch(0.208_0.042_265.755/20%)] hover:shadow-[0_8px_24px_oklch(0.208_0.042_265.755/35%)] hover:scale-105 transition-all duration-300">{initials}</button>
                     </div>
                 ) : (
-                    <button onClick={() => router.push('/profile')} className="flex items-center gap-3 mt-4 p-3 rounded-xl hover:bg-purple-50/60 transition-all duration-300 cursor-pointer w-full text-left">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-200/50 flex-shrink-0">{initials}</div>
+                    <button onClick={() => router.push('/profile')} className="flex items-center gap-3 mt-4 p-3 rounded-xl hover:bg-[oklch(0.968_0.007_247.896)] transition-all duration-300 cursor-pointer w-full text-left">
+                        <div className="w-9 h-9 rounded-xl bg-[oklch(0.208_0.042_265.755)] flex items-center justify-center text-white text-sm font-bold shadow-[0_4px_16px_oklch(0.208_0.042_265.755/20%)] flex-shrink-0">{initials}</div>
                         <motion.div animate={{ opacity: open ? 1 : 0 }} className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-700 truncate">{displayName}</p>
-                            <p className="text-[10px] text-gray-400 truncate">{userCollege || 'Student'}</p>
+                            <p className="text-sm font-semibold text-[oklch(0.25_0.03_260)] truncate">{displayName}</p>
+                            <p className="text-[10px] text-[oklch(0.554_0.046_257.417)] truncate">{userCollege || 'Student'}</p>
                         </motion.div>
                     </button>
+                )}
+                {open && (
+                    <div className="mt-4 flex justify-center">
+                        <a 
+                            href="https://peacecode.in"
+                            className="text-[11px] font-medium text-[oklch(0.554_0.046_257.417)] hover:text-[oklch(0.208_0.042_265.755)] transition-colors"
+                        >
+                            ← Back to peacecode.in
+                        </a>
+                    </div>
                 )}
             </div>
         </div>
@@ -158,40 +168,40 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
 
     return (
-        <div className="min-h-screen bg-[#F4F4FF] font-sans">
+        <div className="min-h-screen bg-[oklch(0.99_0.003_260)] font-sans">
             {/* Top Nav */}
-            <nav className="sticky top-0 z-50 h-16 px-4 lg:px-6 flex items-center justify-between bg-white/70 backdrop-blur-xl border-b border-purple-100/50 shadow-[0_4px_30px_rgba(139,138,255,0.07)]">
+            <nav className="sticky top-0 z-50 h-16 px-4 lg:px-6 flex items-center justify-between bg-[linear-gradient(135deg,oklch(1_0_0/72%),oklch(1_0_0/45%))] backdrop-blur-xl border-b border-[oklch(0.929_0.013_255.508/40%)] shadow-[0_4px_30px_oklch(0.42_0.06_292/5%)]">
                 <div className="flex items-center gap-3">
                     <div className="md:hidden flex items-center gap-2">
-                        <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-xl hover:bg-purple-50 text-gray-500 transition-colors"><Menu className="w-6 h-6" /></button>
+                        <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-xl hover:bg-[oklch(0.968_0.007_247.896)] text-[oklch(0.554_0.046_257.417)] transition-colors"><Menu className="w-6 h-6" /></button>
                         <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
                     </div>
                     <div className="hidden md:flex items-center gap-2">
                         <Image src="/dashboard/assets/Untitled (22).png" alt="Peace Code" width={100} height={28} className="h-7 w-auto" />
-                        <button onClick={() => router.push('/dashboard')} className={cn('p-2 rounded-xl transition-all duration-300', pathname === '/dashboard' ? 'bg-purple-100 text-purple-600' : 'hover:bg-purple-50 text-gray-400 hover:text-purple-500')} title="Dashboard">
+                        <button onClick={() => router.push('/dashboard')} className={cn('p-2 rounded-xl transition-all duration-300', pathname === '/dashboard' ? 'bg-[oklch(0.968_0.007_247.896)] text-[oklch(0.208_0.042_265.755)]' : 'hover:bg-[oklch(0.968_0.007_247.896)] text-[oklch(0.554_0.046_257.417)] hover:text-[oklch(0.208_0.042_265.755)]')} title="Dashboard">
                             <LayoutDashboard className="w-[18px] h-[18px]" />
                         </button>
                     </div>
                 </div>
                 <div className={`relative transition-all duration-500 ease-out hidden md:block ${searchFocused ? 'w-[500px]' : 'w-[380px]'}`}>
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input type="text" placeholder="Search peacecode.in" className="w-full pl-10 pr-20 py-2.5 rounded-2xl bg-gray-50/80 border border-purple-100/60 focus:border-purple-300 focus:bg-white focus:shadow-lg focus:shadow-purple-100/40 outline-none transition-all duration-300 text-sm text-gray-600 placeholder-gray-400" onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)} />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[11px] text-gray-400 bg-white/90 px-2 py-1 rounded-lg border border-gray-200/80 font-medium">⌘ K</div>
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[oklch(0.554_0.046_257.417)]" />
+                    <input type="text" placeholder="Search peacecode.in" className="w-full pl-10 pr-20 py-2.5 rounded-2xl bg-[oklch(0.968_0.007_247.896/80%)] border border-[oklch(0.929_0.013_255.508/60%)] focus:border-[oklch(0.704_0.04_256.788)] focus:bg-white focus:shadow-[0_8px_30px_oklch(0.42_0.06_292/10%)] outline-none transition-all duration-300 text-sm text-[oklch(0.25_0.03_260)] placeholder-[oklch(0.554_0.046_257.417)]" onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)} />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[11px] text-[oklch(0.554_0.046_257.417)] bg-white/90 px-2 py-1 rounded-lg border border-[oklch(0.929_0.013_255.508)] font-medium">⌘ K</div>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="relative">
-                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-gray-600 hover:bg-purple-50 transition-all duration-300 font-medium" onClick={() => setShowServices(!showServices)}>
+                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-[oklch(0.35_0.03_260)] hover:bg-[oklch(0.968_0.007_247.896)] transition-all duration-300 font-medium" onClick={() => setShowServices(!showServices)}>
                         <span className="hidden sm:inline">My Services</span>
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${showServices ? 'rotate-180' : ''}`} />
                         </button>
                         <AnimatePresence>
                             {showServices && (
-                                <motion.div initial={{ opacity: 0, y: -8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.95 }} transition={{ duration: 0.2 }} className="absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl shadow-purple-100/40 border border-purple-50 p-2 z-50">
+                                <motion.div initial={{ opacity: 0, y: -8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.95 }} transition={{ duration: 0.2 }} className="absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-[0_12px_40px_oklch(0.42_0.06_292/12%)] border border-[oklch(0.929_0.013_255.508/60%)] p-2 z-50">
                                     {serviceItems.map((s) => {
                                         const Icon = s.icon; return (
-                                            <button key={s.label} className="w-full text-left px-3 py-3 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-xl transition-all duration-200 flex items-center gap-3 group" onClick={() => { router.push(s.path); setShowServices(false) }}>
-                                                <div className="w-8 h-8 rounded-lg bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center transition-colors"><Icon className="w-4 h-4 text-purple-500" /></div>
-                                                <div><p className="font-semibold text-sm">{s.label}</p><p className="text-[10px] text-gray-400">{s.desc}</p></div>
+                                            <button key={s.label} className="w-full text-left px-3 py-3 text-sm text-[oklch(0.35_0.03_260)] hover:bg-[oklch(0.968_0.007_247.896)] hover:text-[oklch(0.208_0.042_265.755)] rounded-xl transition-all duration-200 flex items-center gap-3 group" onClick={() => { router.push(s.path); setShowServices(false) }}>
+                                                <div className="w-8 h-8 rounded-lg bg-[oklch(0.968_0.007_247.896)] group-hover:bg-[oklch(0.95_0.013_260)] flex items-center justify-center transition-colors"><Icon className="w-4 h-4 text-[oklch(0.45_0.08_265)]" /></div>
+                                                <div><p className="font-semibold text-sm">{s.label}</p><p className="text-[10px] text-[oklch(0.554_0.046_257.417)]">{s.desc}</p></div>
                                             </button>
                                         )
                                     })}
@@ -201,33 +211,33 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                     </div>
                     <button
                         onClick={() => { window.location.href = process.env.NODE_ENV === 'production' ? 'https://peacecode.in' : 'http://localhost:3000' }}
-                        className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-purple-600 hover:bg-purple-50 font-medium transition-all"
+                        className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-[oklch(0.35_0.06_265)] hover:bg-[oklch(0.968_0.007_247.896)] font-medium transition-all"
                     >
                         <Home className="w-4 h-4" /> Landing Page
                     </button>
                     <button
                         onClick={logout}
-                        className="hidden md:flex p-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all"
+                        className="hidden md:flex p-2 rounded-xl text-[oklch(0.554_0.046_257.417)] hover:text-[oklch(0.577_0.245_27.325)] hover:bg-[oklch(0.97_0.02_25)] transition-all"
                         title="Sign Out"
                     >
                         <LogOut className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => router.push('/notifications')}
-                        className="relative p-2.5 rounded-xl hover:bg-purple-50 transition-all duration-300"
+                        className="relative p-2.5 rounded-xl hover:bg-[oklch(0.968_0.007_247.896)] transition-all duration-300"
                         title="Notifications"
                     >
-                        <Bell className="w-5 h-5 text-gray-500" />
-                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse border-2 border-white" />
+                        <Bell className="w-5 h-5 text-[oklch(0.554_0.046_257.417)]" />
+                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[oklch(0.577_0.245_27.325)] rounded-full animate-pulse border-2 border-white" />
                     </button>
-                    <button onClick={() => router.push('/profile')} className="hidden md:flex w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300" title={displayName}>{initials}</button>
+                    <button onClick={() => router.push('/profile')} className="hidden md:flex w-9 h-9 rounded-xl bg-[oklch(0.208_0.042_265.755)] items-center justify-center text-white text-sm font-bold shadow-[0_4px_16px_oklch(0.208_0.042_265.755/20%)] hover:shadow-[0_8px_24px_oklch(0.208_0.042_265.755/35%)] hover:scale-105 transition-all duration-300" title={displayName}>{initials}</button>
                 </div>
             </nav>
 
             {/* Layout */}
             <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] overflow-hidden">
                 <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
-                    <SidebarBody className="justify-between gap-2 shadow-[4px_0_30px_rgba(139,138,255,0.04)]">
+                    <SidebarBody className="justify-between gap-2">
                         <SidebarContent userName={user.name} userCollege={user.college} />
                     </SidebarBody>
                 </Sidebar>
